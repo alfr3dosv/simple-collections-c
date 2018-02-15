@@ -48,12 +48,12 @@ Stackchar *stack_of_chars = NewStackchar();
 #### Functions
 ``push(item)`` Store a item passed by value
 ```
-#(stack_of_chars).push('c');
+$(stack_of_chars).push('c');
 ```
 
 ``pop()`` Get the last item pushed
 ```
-#(stack_of_chars).push('c');
+$(stack_of_chars).push('c');
 ```
 
 ## Contributing
