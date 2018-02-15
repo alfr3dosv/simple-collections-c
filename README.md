@@ -25,7 +25,7 @@ A C89 compiler which has no problem with '$' in macros
 ### Installing
 
 1. Go to releases and download the collections sources
-2. Place it whetever you like
+2. Place it on your project folder
 3. Include the module you want to use  ``#include "collections/stack.h"``
 
 ## Usage
