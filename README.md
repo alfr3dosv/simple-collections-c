@@ -1,6 +1,7 @@
 # Simple Collections C
 
-[![Wercker](https://img.shields.io/wercker/ci/wercker/docs.svg)]()
+[![simple-collections-c](https://img.shields.io/wercker/ci/wercker/docs.svg)]()
+[![simple-collections-c](https://img.shields.io/badge/release-v0.1.1-blue.svg)]()
 
 A simple and easy library for C containers written by a computer science student for other computer science students and the world
 
