@@ -20,9 +20,6 @@ After discussing with a teacher who believes that you can't have object oriented
 ### Prerequisites
 
 A C89 compiler which has no problem with '$' in macros
-```
-Give examples
-```
 
 ### Installing
 
