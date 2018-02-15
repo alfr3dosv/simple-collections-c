@@ -1,4 +1,5 @@
 #define STACK_TYPE(TYPE) GENERATE_DYNAMIC_STACK(Stack##TYPE, TYPE)
+
 #define GENERATE_DYNAMIC_STACK(STACK_NAME, TYPE) typedef struct STACK_NAME { \
 	TYPE item; \
 	struct STACK_NAME* before; \
@@ -17,12 +18,10 @@ struct STACK_NAME##_functions \
 	void (*setSelf)(STACK_NAME **); \
 	void (*push)(TYPE);\
 	TYPE (*pop)(void);\
-	bool (*isEmpty)(void);\
 } static functions = { \
 	STACK_NAME##_setSelf, \
 	STACK_NAME##_push, \
-	STACK_NAME##_pop, \
-	STACK_NAME##_isEmpty \
+	STACK_NAME##_pop \
 }; \
 \
 static STACK_NAME** self = NULL; \
@@ -47,26 +46,16 @@ STACK_NAME** NewSTACK_NAME () {\
 \
 void STACK_NAME##_push(TYPE item) {\
  \
-		STACK_NAME *before = &(**self); \
-		*self = STACK_NAME##_init(); \
-		(**self).before = before; \
-		(**self).item = item;\
-	 \
-}\
-\
-bool STACK_NAME##_isEmpty() {\
-	return !((**self).before); \
+ 	\
+	STACK_NAME *before = &(**self); \
+	*self = STACK_NAME##_init(); \
+	(**self).before = before; \
+	(**self).item = item;\
+	\
 }\
 TYPE STACK_NAME##_pop() {\
 	TYPE item = (**self).item; \
 	STACK_NAME* actual = *self; \
 	*self = (**self).before; \
 	return item; \
-}\
-TYPE STACK_NAME##_items() {\
-\
-	TYPE item = (**self).item; \
-	STACK_NAME* actual = *self; \
-	*self = (**self).before; \
-	return item; \
-}\
+}
