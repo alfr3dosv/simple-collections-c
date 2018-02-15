@@ -15,10 +15,7 @@ $(stack_of_integers).push(59);
 #### But why?
 
 
-After discussing with a teacher who believes that you can not have object oriented programming in C I created this macro monster.
-## Getting Started
-
-
+After discussing with a teacher who believes that you can't have object oriented programming in C I created this macro monster.
 
 ### Prerequisites
 
@@ -44,7 +41,7 @@ Give examples
 STACK_TYPE(char)
 ```
 #### Create an instance
-``Stacktype *instance = NewStacktype()`` This will create a instance of the typed stack
+``Stacktype *instance = Stacktype_init()`` This will create a instance of the typed stack
 ```
 Stackchar *stack_of_chars = NewStackchar();
 ```
@@ -65,8 +62,8 @@ If you have a feature request, or have found a bug, feel free to open a new issu
 
 ## Versioning
 
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags). 
+We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/alfr3dosv/simple-collections-c/tags). 
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
