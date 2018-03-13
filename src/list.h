@@ -5,8 +5,8 @@
 } LIST_NAME; \
 \
 LIST_NAME* LIST_NAME##_init(void); \
-void LIST_NAME##_push(LIST_NAME** self, TYPE index, TYPE item); \
-TYPE LIST_NAME##_get(LIST_NAME** self, TYPE index); \
+void LIST_NAME##_push(LIST_NAME** self, TYPE item, int index); \
+TYPE LIST_NAME##_get(LIST_NAME** self, int index); \
 void LIST_NAME##_append(LIST_NAME **self, TYPE item);\
 \
 LIST_NAME* LIST_NAME##_init() { \
@@ -15,7 +15,7 @@ LIST_NAME* LIST_NAME##_init() { \
 	return new_LIST_NAME; \
 } \
 \
-void LIST_NAME##_push(LIST_NAME** self, TYPE index, TYPE item) {\
+void LIST_NAME##_push(LIST_NAME** self, TYPE item, int index) {\
 	LIST_NAME *next = LIST_NAME##_init();\
 	LIST_NAME *aux = *self;\
 	TYPE i = 0;\
@@ -36,7 +36,7 @@ void LIST_NAME##_append(LIST_NAME **self, TYPE item) {\
 	aux->item = item;\
 }\
 \
-TYPE LIST_NAME##_get(LIST_NAME** self, TYPE index) {\
+TYPE LIST_NAME##_get(LIST_NAME** self, int index) {\
 	LIST_NAME* aux_ptr = *self;\
 	TYPE i = 0;\
 	while(i < index && aux_ptr->next != NULL) {\
@@ -46,7 +46,7 @@ TYPE LIST_NAME##_get(LIST_NAME** self, TYPE index) {\
 	TYPE item = aux_ptr->item;  \
 	return item; \
 }\
-LIST_NAME *LIST_NAME##_get_ptr(LIST_NAME** self, TYPE index) {\
+LIST_NAME *LIST_NAME##_get_ptr(LIST_NAME** self, int index) {\
 	LIST_NAME* aux_ptr = *self;\
 	TYPE i = 0;\
 	while(i < index && aux_ptr->next != NULL) {\
@@ -56,7 +56,7 @@ LIST_NAME *LIST_NAME##_get_ptr(LIST_NAME** self, TYPE index) {\
 	return aux_ptr; \
 }\
 \
-LIST_NAME* LIST_NAME##_remove(LIST_NAME** self, TYPE index) {\
+LIST_NAME* LIST_NAME##_remove(LIST_NAME** self, int index) {\
 	LIST_NAME* node = *self;\
 	LIST_NAME* previous_node;\
 	TYPE i = 0;\
