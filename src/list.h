@@ -1,89 +1,116 @@
-#define LIST(NAME, TYPE) GENERATE_DYNAMIC_LIST(NAME, TYPE)
-#define GENERATE_DYNAMIC_LIST(LIST_NAME, TYPE) typedef struct LIST_NAME { \
-	TYPE item; \
-	struct LIST_NAME* next; \
-} LIST_NAME; \
-\
-LIST_NAME* LIST_NAME##_init(void); \
-void LIST_NAME##_push(LIST_NAME** self, TYPE item, int index); \
-TYPE LIST_NAME##_get(LIST_NAME** self, int index); \
-void LIST_NAME##_append(LIST_NAME **self, TYPE item);\
-\
-LIST_NAME* LIST_NAME##_init() { \
-	LIST_NAME* new_LIST_NAME = malloc(sizeof(LIST_NAME)); \
-	new_LIST_NAME->next = NULL; \
-	return new_LIST_NAME; \
+#define LINKED_LIST(NAME, TYPE) GENERATE_DYNAMIC_LINKED_LIST(NAME, NAME##_node, TYPE)
+#define GENERATE_DYNAMIC_LINKED_LIST(LIST, NODE, TYPE) \
+typedef struct LIST { \
+	TYPE value; \
+	struct NODE* head; \
+	int size; \
+} LIST; \
+ \
+typedef struct NODE { \
+	TYPE value; \
+	struct NODE* next; \
+	struct NODE* previous; \
+} NODE; \
+ \
+ \
+LIST* LIST##_new(void); \
+bool LIST##_insert_node(LIST *self, NODE *, NODE *); \
+void LIST##_push(LIST* self, TYPE value, int index); \
+TYPE LIST##_get(LIST* self, int index); \
+void LIST##_append(LIST* self, TYPE value); \
+ \
+LIST* LIST##_new() { \
+	LIST* list = malloc(sizeof(LIST)); \
+	list->head = NULL; \
+	list->size = 0; \
+	return list; \
+} \
+ \
+NODE* NODE##_new() { \
+	NODE* node = malloc(sizeof(NODE)); \
+	node->next = NULL; \
+	node->previous = NULL; \
+	return node; \
+} \
+ \
+void LIST##_insert_at(int position, LIST *self, TYPE value) { \
+	if (self->size < 0) \
+		return; \
+	NODE *aux = self->head; \
+	int i = 0; \
+	while(i < position && aux->next != NULL) { \
+		aux = aux->next; \
+		i++; \
+	} \
+	if (aux && i >= position) { \
+		NODE *new_node = NODE##_new(); \
+		if (new_node) { \
+			new_node->value = value; \
+			LIST##_insert_node(self, aux, new_node); \
+		} \
+	} \
+} \
+ \
+void LIST##_append(LIST *self, TYPE value) { \
+	if (self && !self->head) { \
+		self->head = NODE##_new(); \
+		self->head->value = value; \
+		self->size++; \
+	} else if (self && self->head) { \
+		NODE *new_head = NODE##_new(); \
+		if (new_head) { \
+			self->head->previous = new_head; \
+			new_head->next = self->head; \
+			new_head->value = value; \
+			self->head = new_head; \
+			self->size++; \
+		} \
+	} \
 } \
 \
-void LIST_NAME##_push(LIST_NAME** self, TYPE item, int index) {\
-	LIST_NAME *next = LIST_NAME##_init();\
-	LIST_NAME *aux = *self;\
-	TYPE i = 0;\
-	while(i < index, aux->next != NULL) {\
-		aux = aux->next;\
-	}\
-	aux->next = next; \
-	aux->item = item;\
-}\
+bool LIST##_insert_node(LIST *self, NODE* node_before, NODE *node) { \
+	if (self && node_before && node) { \
+		if (self->head == node_before) { \
+			node->next = node_before; \
+			node_before->previous = node; \
+			self->head = node; \
+		} else { \
+			node_before->previous->next = node; \
+			node_before->previous = node; \
+			node->next = node_before; \
+			node->previous = node_before; \
+		} \
+		self->size++; \
+		return true; \
+	} \
+ 	return false; \
+} \
 \
-void LIST_NAME##_append(LIST_NAME **self, TYPE item) {\
-	LIST_NAME *next = LIST_NAME##_init();\
-	LIST_NAME *aux = *self;\
-	while(aux->next != NULL) {\
-		aux = aux->next;\
-	}\
-	aux->next = next;\
-	aux->item = item;\
-}\
-\
-TYPE LIST_NAME##_get(LIST_NAME** self, int index) {\
-	LIST_NAME* aux_ptr = *self;\
-	TYPE i = 0;\
-	while(i < index && aux_ptr->next != NULL) {\
-		i++;\
-		aux_ptr = aux_ptr->next;\
-	}\
-	TYPE item = aux_ptr->item;  \
-	return item; \
-}\
-LIST_NAME *LIST_NAME##_get_ptr(LIST_NAME** self, int index) {\
-	LIST_NAME* aux_ptr = *self;\
-	TYPE i = 0;\
-	while(i < index && aux_ptr->next != NULL) {\
-		i++;\
-		aux_ptr = aux_ptr->next;\
-	}\
-	return aux_ptr; \
-}\
-\
-LIST_NAME* LIST_NAME##_remove(LIST_NAME** self, int index) {\
-	LIST_NAME* node = *self;\
-	LIST_NAME* previous_node;\
-	TYPE i = 0;\
-	while(i < index && node->next != NULL) {\
-		i++;\
-		previous_node = node;\
-		node = node->next;\
-	}\
-	if (node == *self) {\
-		LIST_NAME* node_to_remove = *self;\
-		*self = (**self).next;\
-		return node_to_remove;\
-	}\
-	LIST_NAME* node_to_remove = node;\
-	previous_node->next = node;\
-\
-	return node_to_remove;\
-}\
-\
-TYPE LIST_NAME##_size(LIST_NAME** self) {\
-	LIST_NAME* aux_ptr = *self;\
-	TYPE size = 0;\
-	while(aux_ptr->next != NULL) {\
-		size++;\
-		aux_ptr = aux_ptr->next;\
-	}\
-	return size; \
+TYPE LIST##_get(LIST* self, int index) { \
+	NODE* aux = self->head; \
+	int i = 0; \
+	while(i < index && aux->next != NULL) { \
+		i++; \
+		aux = aux->next; \
+	} \
+	TYPE value; \
+	if (aux && i == index) \
+		value = aux->value; \
+	return value; \
+} \
+ \
+NODE* LIST##_remove(LIST* self, int index) { \
+	NODE* node = self->head; \
+	NODE* previous_node = NULL; \
+	int i = 0; \
+	while(i < index && node->next != NULL) { \
+		i++; \
+		previous_node = node; \
+		node = node->next; \
+	} \
+	if (node == self->head) \
+		self->head = node->next; \
+	return node; \
 }
 
-#define foreach_list(X, LIST) for(X = LIST; X->next != NULL; X = X->next)
+#define foreach_node(X, LIST) for(X = LIST->head; X != NULL; X = X->next)
