@@ -1,6 +1,6 @@
-#include "collections.h"
-#define STACK(NAME, TYPE) GENERATE_DYNAMIC_STACK(NAME, NAME##_node, TYPE)
-#define GENERATE_DYNAMIC_STACK(STACK, NODE, TYPE) \
+#include <stdlib.h>
+#define STACK(TYPE, NAME, FUNCTION_PREFIX) GENERATE_DYNAMIC_STACK(NAME, NAME##NODE, TYPE, FUNCTION_PREFIX)
+#define GENERATE_DYNAMIC_STACK(STACK, NODE, TYPE, FN) \
  \
 typedef struct STACK { \
     	TYPE item; \
@@ -14,9 +14,9 @@ typedef struct NODE { \
         struct NODE* previous; \
 } NODE; \
  \
-STACK* STACK##_new(void); \
+STACK* FN##_new(void); \
  \
-STACK* STACK##_new() { \
+STACK* FN##_new() { \
 	STACK* stack = malloc(sizeof(STACK)); \
 	stack->head = NULL; \
 	stack->size = 0; \
@@ -24,28 +24,37 @@ STACK* STACK##_new() { \
 	return stack; \
 } \
  \
-NODE* NODE##_new() { \
+NODE* FN##_node_new() { \
 	NODE* node = malloc(sizeof(NODE)); \
 	node->previous = NULL; \
 	return node; \
 } \
  \
-bool STACK##_push(STACK *self, TYPE item) { \
+bool FN##_push(STACK *self, TYPE item) { \
 	if(self && self->head) { \
 		NODE* previous = self->head; \
-		self->head = NODE##_new(); \
-		self->head->previous = previous; \
-		self->head->item = item; \
-		self->size++; \
+		self->head = FN##_node_new(); \
+		if (self->head) { \
+			self->head->previous = previous; \
+			self->head->item = item; \
+			self->size++; \
+			return true; \
+		} \
+		else { \
+			self->head = previous; \
+		} \
 	} else if (self && !self->head) { \
-		self->head = NODE##_new(); \
-		self->head->item = item; \
-		self->size = 1; \
+		self->head = FN##_node_new(); \
+		if (self->head) { \
+			self->head->item = item; \
+			self->size = 1; \
+			return true; \
+		} \
 	} \
 	return false; \
 } \
  \
-TYPE STACK##_pop(STACK *self){ \
+TYPE FN##_pop(STACK *self){ \
 	if (self && self->head) { \
 		TYPE item; \
 		item = self->head->item; \
