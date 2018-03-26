@@ -5,7 +5,7 @@
 typedef struct STACK { \
     	TYPE item; \
         struct NODE *head; \
-        void (*delete_item)(void* item); \
+        void (*delete_node)(void* item); \
         int size; \
 } STACK; \
  \
@@ -20,7 +20,7 @@ STACK* FN##_new() { \
 	STACK* stack = malloc(sizeof(STACK)); \
 	stack->head = NULL; \
 	stack->size = 0; \
-	stack->delete_item = free; \
+	stack->delete_node = free; \
 	return stack; \
 } \
  \
@@ -59,7 +59,7 @@ TYPE FN##_pop(STACK *self){ \
 		TYPE item; \
 		item = self->head->item; \
 		NODE* previous = self->head->previous; \
-		self->delete_item(self->head); \
+		self->delete_node(self->head); \
 		self->head = previous; \
 		self->size--; \
 		if (self->size < 0) \
