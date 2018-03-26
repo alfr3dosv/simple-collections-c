@@ -66,4 +66,11 @@ TYPE FN##_pop(STACK *self){ \
 			self->size = 0; \
 		return item;\
 	} \
+} \
+TYPE FN##_peek(STACK *self){ \
+	if (self && self->head) { \
+		TYPE item; \
+		item = self->head->item; \
+		return item;\
+	} \
 }
