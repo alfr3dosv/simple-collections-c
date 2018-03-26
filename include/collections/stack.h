@@ -14,13 +14,13 @@ typedef struct NODE { \
         struct NODE* previous; \
 } NODE; \
  \
-STACK* FN##_new(void); \
+void (* FN##_free)(void *node) = free; \
+void (* FN##_free_node)(void *node) = free; \
  \
 STACK* FN##_new() { \
 	STACK* stack = malloc(sizeof(STACK)); \
 	stack->head = NULL; \
 	stack->size = 0; \
-	stack->delete_node = free; \
 	return stack; \
 } \
  \
@@ -59,7 +59,7 @@ TYPE FN##_pop(STACK *self){ \
 		TYPE item; \
 		item = self->head->item; \
 		NODE* previous = self->head->previous; \
-		self->delete_node(self->head); \
+		FN##_free_node(self->head); \
 		self->head = previous; \
 		self->size--; \
 		if (self->size < 0) \
