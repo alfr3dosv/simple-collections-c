@@ -81,7 +81,7 @@ bool FN##_insert_node(LIST *self, NODE* node_before, NODE *node) { \
  \
 NODE* FN##_append(LIST *self, TYPE value) { \
     NODE* new_node = NULL; \
-    if (self && !self->last) { \
+    if (self && !self->head) { \
         new_node = NODE##_new(); \
         if (new_node) { \
             self->last = new_node; \
@@ -95,6 +95,7 @@ NODE* FN##_append(LIST *self, TYPE value) { \
             self->last->next = new_node; \
             new_node->previous = self->last; \
             new_node->value = value; \
+            self->last = new_node; \
             self->size++; \
         } \
     } \
@@ -137,14 +138,29 @@ bool FN##_remove_node(LIST* self, NODE* node) { \
         if (node->next) { \
             self->head = node->next; \
             self->head->previous = NULL; \
+            self->last = node->next; \
         } \
     } \
     else { \
-        node->previous->next = node->next; \
-        node->next->previous = node->previous; \
+        if (node->previous) \
+            node->previous->next = node->next; \
+        if (node->next) \
+            node->next->previous = node->previous; \
+        if (node == self->last && self->last != NULL) \
+            self->last = node->previous; \
         FN##_free_node(node); \
     } \
     self->size--; \
+} \
+\
+TYPE FN##_pop(LIST* self) { \
+    TYPE value; \
+    if (self->last) { \
+        value = self->last->value; \
+        FN##_remove_node(self, self->last); \
+        return value; \
+    } \
+    return value; \
 }
 
 #define foreach_node(X, LIST) for(X = LIST->head; X != NULL; X = X->next)
