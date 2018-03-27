@@ -1,26 +1,28 @@
-#define LINKED_LIST(NAME, TYPE) GENERATE_DYNAMIC_LINKED_LIST(NAME, NAME##_node, TYPE)
-#define GENERATE_DYNAMIC_LINKED_LIST(LIST, NODE, TYPE) \
+#define LINKED_LIST(TYPE, NAME, FUNCTION_PREFIX) GENERATE_DYNAMIC_LINKED_LIST(NAME, NAME##Node, TYPE, FUNCTION_PREFIX)
+#define GENERATE_DYNAMIC_LINKED_LIST(LIST, NODE, TYPE, FN) \
 typedef struct LIST { \
     TYPE value; \
     struct NODE* head; \
+    struct NODE* last; \
     int size; \
 } LIST; \
- \
 typedef struct NODE { \
     TYPE value; \
     struct NODE* next; \
     struct NODE* previous; \
 } NODE; \
  \
-LIST* LIST##_new(void); \
-bool LIST##_insert_node(LIST *self, NODE *, NODE *); \
-void LIST##_push(LIST* self, TYPE value, int index); \
-TYPE LIST##_get(LIST* self, int index); \
-void LIST##_append(LIST* self, TYPE value); \
+LIST* FN##_new(void); \
+bool FN##_insert_node(LIST *self, NODE *, NODE *); \
+NODE* FN##_insert(LIST* self, int index, TYPE value); \
+TYPE FN##_get(LIST* self, int index); \
+NODE* FN##_append(LIST* self, TYPE value); \
+bool FN##_remove_node(LIST* self, NODE* node); \
+TYPE FN##_remove(LIST* self, int index); \
 void (* FN##_free)(void *node) = free; \
 void (* FN##_free_node)(void *node) = free; \
  \
-LIST* LIST##_new() { \
+LIST* FN##_new() { \
     LIST* list = malloc(sizeof(LIST)); \
     list->head = NULL; \
     list->size = 0; \
@@ -34,60 +36,72 @@ NODE* NODE##_new() { \
     return node; \
 } \
  \
-void LIST##_insert_at(int position, LIST *self, TYPE value) { \
-    if (self->size < 0) \
-        return; \
+NODE* FN##_insert(LIST *self, int position, TYPE value) { \
+    if (self->size < position) \
+        return NULL; \
     NODE *aux = self->head; \
-    int i = 0; \
+    int i = 1; \
     while(i < position && aux->next != NULL) { \
         aux = aux->next; \
         i++; \
     } \
-    if (aux && i >= position) { \
+    if (i >= position) { \
         NODE *new_node = NODE##_new(); \
         if (new_node) { \
             new_node->value = value; \
-            LIST##_insert_node(self, aux, new_node); \
+            FN##_insert_node(self, aux, new_node); \
         } \
+        return new_node; \
     } \
 } \
- \
-void LIST##_append(LIST *self, TYPE value) { \
-    if (self && !self->head) { \
-        self->head = NODE##_new(); \
-        self->head->value = value; \
-        self->size++; \
-    } else if (self && self->head) { \
-        NODE *new_head = NODE##_new(); \
-        if (new_head) { \
-            self->head->previous = new_head; \
-            new_head->next = self->head; \
-            new_head->value = value; \
-            self->head = new_head; \
-            self->size++; \
-        } \
-    } \
-} \
-\
-bool LIST##_insert_node(LIST *self, NODE* node_before, NODE *node) { \
-    if (self && node_before && node) { \
-        if (self->head == node_before) { \
-            node->next = node_before; \
-            node_before->previous = node; \
+bool FN##_insert_node(LIST *self, NODE* node_before, NODE *node) { \
+    if (self && node) { \
+        if ((self->head == node_before && node_before == NULL) || \
+            node_before == NULL) \
+        { \
             self->head = node; \
-        } else { \
-            node_before->previous->next = node; \
-            node_before->previous = node; \
-            node->next = node_before; \
+            self->last = node; \
+        } \
+        else { \
+            if (node_before->next) { \
+                node->next = node_before->next; \
+                node_before->next->previous = node; \
+            } \
+            else { \
+                self->last = node; \
+            } \
             node->previous = node_before; \
+            node_before->next = node; \
         } \
         self->size++; \
         return true; \
     } \
     return false; \
 } \
+ \
+NODE* FN##_append(LIST *self, TYPE value) { \
+    NODE* new_node = NULL; \
+    if (self && !self->last) { \
+        new_node = NODE##_new(); \
+        if (new_node) { \
+            self->last = new_node; \
+            self->head = new_node; \
+            self->head->value = value; \
+            self->size++; \
+        } \
+    } else if (self && self->last) { \
+        new_node = NODE##_new(); \
+        if (new_node) { \
+            self->last->next = new_node; \
+            new_node->previous = self->last; \
+            new_node->value = value; \
+            self->size++; \
+        } \
+    } \
+    return new_node; \
+} \
 \
-TYPE LIST##_get(LIST* self, int index) { \
+TYPE FN##_get(LIST* self, int index) { \
     NODE* aux = self->head; \
     int i = 0; \
     while(i < index && aux->next != NULL) { \
@@ -100,17 +114,37 @@ TYPE LIST##_get(LIST* self, int index) { \
     return value; \
 } \
  \
-NODE* LIST##_remove(LIST* self, int index) { \
-    NODE* node = self->head; \
-    NODE* previous_node = NULL; \
+TYPE FN##_remove(LIST* self, int position) { \
+    TYPE value; \
+    if (self->size < position) \
+        return value; \
+    NODE *aux = self->head; \
     int i = 0; \
-    while(i < index && node->next != NULL) { \
+    while(i < position && aux->next != NULL) { \
+        aux = aux->next; \
         i++; \
-        previous_node = node; \
-        node = node->next; \
     } \
-    if (node == self->head) \
-        self->head = node->next; \
-    return node; \
+    if (i >= position) { \
+        value = aux->value; \
+        FN##_remove_node(self, aux); \
+        return value; \
+    } \
 } \
+bool FN##_remove_node(LIST* self, NODE* node) { \
+    if (!node) \
+        return false; \
+    if (self->head == node) { \
+        if (node->next) { \
+            self->head = node->next; \
+            self->head->previous = NULL; \
+        } \
+    } \
+    else { \
+        node->previous->next = node->next; \
+        node->next->previous = node->previous; \
+        FN##_free_node(node); \
+    } \
+    self->size--; \
+}
+
 #define foreach_node(X, LIST) for(X = LIST->head; X != NULL; X = X->next)

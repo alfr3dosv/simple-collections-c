@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "tests/stack.h"
+#include "tests/linked_list.h"
 
 char * run_tests() {
     return 0;
@@ -7,6 +8,7 @@ char * run_tests() {
 
 static char * all_tests() {
     mu_run_suite(stack_tests);
+    mu_run_suite(linked_list_tests);
     return 0;
 }
 
