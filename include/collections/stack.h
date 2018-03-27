@@ -1,4 +1,8 @@
+#ifndef STACK_H
+#define STACK_H
+#include <stdbool.h>
 #include <stdlib.h>
+
 #define STACK(TYPE, NAME, FUNCTION_PREFIX) GENERATE_DYNAMIC_STACK(NAME, NAME##NODE, TYPE, FUNCTION_PREFIX)
 #define GENERATE_DYNAMIC_STACK(STACK, NODE, TYPE, FN) \
  \
@@ -74,3 +78,5 @@ TYPE FN##_peek(STACK *self){ \
 		return item;\
 	} \
 }
+
+#endif

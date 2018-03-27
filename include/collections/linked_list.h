@@ -1,3 +1,8 @@
+#ifndef LINKED_LIST_H
+#define LINKED_LIST_H
+#include <stdbool.h>
+#include <stdlib.h>
+
 #define LINKED_LIST(TYPE, NAME, FUNCTION_PREFIX) GENERATE_DYNAMIC_LINKED_LIST(NAME, NAME##Node, TYPE, FUNCTION_PREFIX)
 #define GENERATE_DYNAMIC_LINKED_LIST(LIST, NODE, TYPE, FN) \
 typedef struct LIST { \
@@ -164,3 +169,5 @@ TYPE FN##_pop(LIST* self) { \
 }
 
 #define foreach_node(X, LIST) for(X = LIST->head; X != NULL; X = X->next)
+
+#endif
